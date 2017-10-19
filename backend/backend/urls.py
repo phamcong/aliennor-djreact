@@ -15,8 +15,14 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
+from django.conf import settings
+from django.views.static import serve
+from django.conf.urls.static import static
 from django.contrib.auth.models import User
 from rest_framework import routers, serializers, viewsets
+from django.core.urlresolvers import reverse_lazy
+import django.contrib.auth
+import ecocases
 
 # Serializers define the API representation.
 
@@ -41,8 +47,21 @@ router.register(r'users', UserViewSet)
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.
 urlpatterns = [
+    url(r'^ecocases/', include('ecocases.urls',
+                               namespace='ecocases', app_name='ecocases')),
     url(r'^', include('api.urls', namespace='api', app_name='api')),
     # url(r'^', include(router.urls)),
     url(r'^admin/', admin.site.urls),
-    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework'))
+    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    url(r'^login/$', django.contrib.auth.views.login, {'template_name': 'login.html'},
+        name='mysite_login'),
+    url(r'^logout/$', django.contrib.auth.views.logout,
+        {'next_page': reverse_lazy('ecocases:index')}, name='mysite_logout'),
+    url(r'^signup/$', ecocases.views.signup, name='mysite_signup'),
+    url(r'^activate/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
+        ecocases.views.activate, name='registration_activate'),
 ]
+
+if settings.DEBUG is True:
+    urlpatterns += static(settings.MEDIA_URL,
+                          document_root=settings.MEDIA_ROOT)
