@@ -42,8 +42,8 @@ $(document).ready(function(){
                     </div>    
                     <div class="panel-body">
                         <div class="ecocase-image-list">
-                            {% if ecocase.first_image_url != '' %} 
-                                <img src="{{ ecocase.first_image_url }}" class="center-block displayed" alt="" height="300px">
+                            {% if ecocase.first_image_url %} 
+                                <img src="{% static ecocase.first_image_url %}" class="center-block displayed" alt="" height="300px">
                             {% else %}
                                 <img src="{% static 'ecocases/no_visualization.png' %}" class="center-block displayed" alt="" height="300px">
                             {% endif %}
